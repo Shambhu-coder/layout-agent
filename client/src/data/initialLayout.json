@@ -1,0 +1,146 @@
+{
+  "rootNodes": ["artboard-1"],
+  "nodes": {
+    "artboard-1": {
+      "id": "artboard-1",
+      "type": "artboard",
+      "name": "Instagram Post",
+      "x": 0,
+      "y": 0,
+      "width": 1080,
+      "height": 1080,
+      "nx": 0,
+      "ny": 0,
+      "nw": 1,
+      "nh": 1,
+      "children": ["bg-1", "product-1", "headline-1", "offer-1", "discount-1"],
+      "data": {
+        "backgroundColor": "#1a1a2e"
+      }
+    },
+    "bg-1": {
+      "id": "bg-1",
+      "type": "image",
+      "name": "Background.png",
+      "x": 0,
+      "y": 0,
+      "width": 1080,
+      "height": 1080,
+      "nx": 0,
+      "ny": 0,
+      "nw": 1,
+      "nh": 1,
+      "data": {
+        "src": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1080",
+        "content": "Background"
+      },
+      "style": {
+        "visual": {
+          "opacity": 0.4
+        }
+      }
+    },
+    "product-1": {
+      "id": "product-1",
+      "type": "image",
+      "name": "Product.png",
+      "x": 216,
+      "y": 200,
+      "width": 648,
+      "height": 540,
+      "nx": 0.2,
+      "ny": 0.185,
+      "nw": 0.6,
+      "nh": 0.5,
+      "data": {
+        "src": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600",
+        "content": "Product Image"
+      },
+      "style": {
+        "visual": {
+          "borderRadius": 12
+        }
+      }
+    },
+    "headline-1": {
+      "id": "headline-1",
+      "type": "text",
+      "name": "Headline",
+      "x": 108,
+      "y": 800,
+      "width": 864,
+      "height": 120,
+      "nx": 0.1,
+      "ny": 0.74,
+      "nw": 0.8,
+      "nh": 0.11,
+      "data": {
+        "content": "Luxury Comfort, Surprisingly Attainable"
+      },
+      "style": {
+        "visual": {
+          "fontSize": 52,
+          "fontWeight": "bold",
+          "color": "#ffffff",
+          "textAlign": "center",
+          "fontFamily": "Georgia, serif"
+        }
+      }
+    },
+    "offer-1": {
+      "id": "offer-1",
+      "type": "text",
+      "name": "Offer Badge",
+      "x": 108,
+      "y": 60,
+      "width": 500,
+      "height": 60,
+      "nx": 0.1,
+      "ny": 0.056,
+      "nw": 0.46,
+      "nh": 0.056,
+      "data": {
+        "content": "Limited Time Offer"
+      },
+      "style": {
+        "visual": {
+          "fontSize": 28,
+          "fontWeight": "600",
+          "color": "#ffd700",
+          "textAlign": "left",
+          "fontFamily": "Arial, sans-serif",
+          "backgroundColor": "rgba(255, 215, 0, 0.15)",
+          "borderRadius": 8,
+          "padding": "8px 16px"
+        }
+      }
+    },
+    "discount-1": {
+      "id": "discount-1",
+      "type": "shape",
+      "name": "Discount Badge",
+      "x": 810,
+      "y": 40,
+      "width": 200,
+      "height": 200,
+      "nx": 0.75,
+      "ny": 0.037,
+      "nw": 0.185,
+      "nh": 0.185,
+      "data": {
+        "content": "20% OFF",
+        "shape": "circle"
+      },
+      "style": {
+        "visual": {
+          "backgroundColor": "#e63946",
+          "color": "#ffffff",
+          "fontSize": 32,
+          "fontWeight": "bold",
+          "textAlign": "center",
+          "borderRadius": "50%"
+        }
+      }
+    }
+  }
+}
