@@ -1,29 +1,30 @@
-import { useState } from 'react';
-import axios from 'axios';
-import initialLayout from '../data/initialLayout.json';
+import { useState } from "react";
+import axios from "axios";
+import initialLayout from "../data/initialLayout.json";
 
 export function useLayoutAgent() {
   const [layout, setLayout] = useState(initialLayout);
   const [messages, setMessages] = useState([
     {
-      role: 'assistant',
-      content: '👋 Hi! I\'m your Layout Agent. I can help you modify this design. Try asking me:\n• "Convert to 9:16"\n• "Move the headline to the top"\n• "Make the discount badge bigger"\n• "Change headline color to red"'
-    }
+      role: "assistant",
+      content:
+        '👋 Hi! I\'m your Layout Agent. I can help you modify this design. Try asking me:\n• "Convert to 9:16"\n• "Move the headline to the top"\n• "Make the discount badge bigger"\n• "Change headline color to red"',
+    },
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const sendMessage = async (text) => {
-    const newUserMsg = { role: 'user', content: text };
+    const newUserMsg = { role: "user", content: text };
     setMessages((prev) => [...prev, newUserMsg]);
     setLoading(true);
     setError(null);
 
     try {
-      const { data } = await axios.post('/api/chat', {
+      const { data } = await axios.post("/api/chat", {
         message: text,
         layout,
-        history: messages.slice(-6)
+        history: messages.slice(-6),
       });
 
       if (data.updatedLayout) {
@@ -32,30 +33,67 @@ export function useLayoutAgent() {
 
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: data.explanation || 'Done! Layout updated.' }
+        {
+          role: "assistant",
+          content: data.explanation || "Done! Layout updated.",
+        },
       ]);
     } catch (err) {
-      const errMsg = err.response?.data?.error || 'Something went wrong. Please try again.';
+      const errMsg =
+        err.response?.data?.error || "Something went wrong. Please try again.";
       setError(errMsg);
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: `❌ ${errMsg}` }
+        { role: "assistant", content: `❌ ${errMsg}` },
       ]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Directly patch one or more node fields without calling the AI
+  const updateLayout = (nodeId, patch) => {
+    setLayout((prev) => ({
+      ...prev,
+      nodes: {
+        ...prev.nodes,
+        [nodeId]: {
+          ...prev.nodes[nodeId],
+          ...patch,
+          data: {
+            ...prev.nodes[nodeId]?.data,
+            ...(patch.data || {}),
+          },
+          style: {
+            ...prev.nodes[nodeId]?.style,
+            visual: {
+              ...prev.nodes[nodeId]?.style?.visual,
+              ...(patch.style?.visual || {}),
+            },
+          },
+        },
+      },
+    }));
+  };
+
   const resetLayout = () => {
     setLayout(initialLayout);
     setMessages([
       {
-        role: 'assistant',
-        content: '🔄 Layout has been reset to the original design!'
-      }
+        role: "assistant",
+        content: "🔄 Layout has been reset to the original design!",
+      },
     ]);
     setError(null);
   };
 
-  return { layout, messages, loading, error, sendMessage, resetLayout };
+  return {
+    layout,
+    messages,
+    loading,
+    error,
+    sendMessage,
+    updateLayout,
+    resetLayout,
+  };
 }
