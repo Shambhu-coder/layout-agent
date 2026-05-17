@@ -33,70 +33,41 @@ function TabBtn({ label, icon, active, onClick }) {
         if (!active) e.currentTarget.style.color = "var(--color-text-3)";
       }}
     >
-      {icon} {label}
+      {icon}
+      {label}
     </button>
   );
 }
 
-function StatusPill({ count }) {
-  return (
-    <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 6,
-        background: "rgba(34,197,94,0.1)",
-        border: "1px solid rgba(34,197,94,0.25)",
-        borderRadius: 99,
-        padding: "3px 10px",
-        fontSize: 11,
-        color: "var(--color-green)",
-        fontFamily: "var(--font-mono)",
-      }}
-    >
-      <span
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: "50%",
-          background: "var(--color-green)",
-          display: "inline-block",
-        }}
-      />
-      {count} messages
-    </div>
-  );
-}
-
-// Panel that lets the user directly edit images and text nodes
 function EditPanel({ layout, updateLayout }) {
   const rootId = layout.rootNodes[0];
   const artboard = layout.nodes[rootId];
   const fileRefs = useRef({});
+  const [expanded, setExpanded] = useState(true);
 
   if (!artboard) return null;
 
   const imageNodes =
     artboard.children
       ?.map((id) => layout.nodes[id])
-      .filter((n) => n && n.type === "image") || [];
-
+      .filter((n) => n?.type === "image") || [];
   const textNodes =
     artboard.children
       ?.map((id) => layout.nodes[id])
-      .filter((n) => n && n.type === "text") || [];
+      .filter((n) => n?.type === "text") || [];
 
-  const handleImageFile = (nodeId, file) => {
+  const handleFile = (nodeId, file) => {
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    updateLayout(nodeId, { data: { src: url, content: file.name } });
+    updateLayout(nodeId, {
+      data: { src: URL.createObjectURL(file), content: file.name },
+    });
   };
 
-  const handleImageUrl = (nodeId, url) => {
-    updateLayout(nodeId, { data: { src: url } });
+  const handleUrl = (nodeId, url) => {
+    if (url.trim()) updateLayout(nodeId, { data: { src: url.trim() } });
   };
 
-  const handleTextChange = (nodeId, content) => {
+  const handleText = (nodeId, content) => {
     updateLayout(nodeId, { data: { content } });
   };
 
@@ -104,199 +75,391 @@ function EditPanel({ layout, updateLayout }) {
     <div
       style={{
         borderTop: "1px solid var(--color-border)",
-        background: "var(--color-surface)",
+        flexShrink: 0,
+        background: "#0e1017",
       }}
     >
-      {/* Section header */}
-      <div
+      {/* Collapsible header */}
+      <button
+        onClick={() => setExpanded((p) => !p)}
         style={{
-          padding: "8px 14px",
-          fontSize: 10,
-          fontWeight: 600,
-          color: "var(--color-text-3)",
-          fontFamily: "var(--font-mono)",
-          textTransform: "uppercase",
-          letterSpacing: "0.08em",
-          borderBottom: "1px solid var(--color-border)",
+          width: "100%",
           display: "flex",
           alignItems: "center",
-          gap: 6,
+          justifyContent: "space-between",
+          padding: "10px 16px",
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          borderBottom: expanded ? "1px solid var(--color-border)" : "none",
         }}
       >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div
+            style={{
+              width: 20,
+              height: 20,
+              borderRadius: 5,
+              background: "rgba(108,99,255,0.15)",
+              border: "1px solid rgba(108,99,255,0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <svg
+              width="10"
+              height="10"
+              fill="none"
+              stroke="#8b83ff"
+              strokeWidth="2.2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"
+              />
+            </svg>
+          </div>
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--color-text-2)",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Edit Content
+          </span>
+          <span
+            style={{
+              fontSize: 10,
+              color: "var(--color-text-3)",
+              background: "var(--color-surface-2)",
+              border: "1px solid var(--color-border)",
+              borderRadius: 99,
+              padding: "1px 7px",
+              fontFamily: "var(--font-mono)",
+            }}
+          >
+            {imageNodes.length + textNodes.length} fields
+          </span>
+        </div>
         <svg
-          width="11"
-          height="11"
+          width="12"
+          height="12"
           fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
+          stroke="var(--color-text-3)"
+          strokeWidth="2.2"
           viewBox="0 0 24 24"
+          style={{
+            transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s",
+          }}
         >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"
+            d="M19.5 8.25l-7.5 7.5-7.5-7.5"
           />
         </svg>
-        Edit Content
-      </div>
+      </button>
 
-      <div
-        style={{
-          padding: "10px 14px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-        }}
-      >
-        {/* Image nodes */}
-        {imageNodes.map((node) => (
-          <div key={node.id}>
-            <div
-              style={{
-                fontSize: 11,
-                color: "var(--color-text-3)",
-                marginBottom: 5,
-                fontFamily: "var(--font-mono)",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
-              <span
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: 1,
-                  background: "rgba(59,130,246,0.5)",
-                  display: "inline-block",
-                }}
-              />
-              {node.name}
-            </div>
-            <div style={{ display: "flex", gap: 6 }}>
-              {/* Upload button */}
-              <button
-                onClick={() => fileRefs.current[node.id]?.click()}
+      {expanded && (
+        <div
+          style={{
+            padding: "12px 16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 16,
+            maxHeight: 280,
+            overflowY: "auto",
+          }}
+        >
+          {/* Images */}
+          {imageNodes.map((node) => (
+            <div key={node.id}>
+              <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 5,
-                  fontSize: 11,
-                  padding: "5px 10px",
-                  background: "var(--color-surface-2)",
-                  border: "1px solid var(--color-border-2)",
-                  borderRadius: 7,
-                  color: "var(--color-text-2)",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                  fontFamily: "var(--font-sans)",
+                  gap: 6,
+                  marginBottom: 7,
                 }}
               >
-                <svg
-                  width="11"
-                  height="11"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 1,
+                    background: "#3b82f6",
+                    display: "inline-block",
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    color: "var(--color-text-3)",
+                    fontFamily: "var(--font-mono)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                  }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                  {node.name}
+                </span>
+              </div>
+              <div
+                style={{
+                  border: "1px solid var(--color-border-2)",
+                  borderRadius: 10,
+                  overflow: "hidden",
+                  background: "var(--color-surface-2)",
+                }}
+              >
+                {/* Preview strip */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "8px 12px",
+                    borderBottom: "1px solid var(--color-border)",
+                    background: "rgba(255,255,255,0.02)",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 7,
+                      overflow: "hidden",
+                      border: "1px solid var(--color-border)",
+                      flexShrink: 0,
+                      background: "var(--color-surface)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {node.data?.src ? (
+                      <img
+                        src={node.data.src}
+                        alt=""
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <svg
+                        width="14"
+                        height="14"
+                        fill="none"
+                        stroke="var(--color-text-3)"
+                        strokeWidth="1.5"
+                        viewBox="0 0 24 24"
+                      >
+                        <rect x="3" y="3" width="18" height="18" rx="3" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <path d="M21 15l-5-5L5 21" />
+                      </svg>
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: "var(--color-text-2)",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        marginBottom: 3,
+                      }}
+                    >
+                      {node.data?.src
+                        ? node.data.src.startsWith("blob:")
+                          ? "📁 Local file"
+                          : "🔗 URL"
+                        : "No image set"}
+                    </div>
+                    <button
+                      onClick={() => fileRefs.current[node.id]?.click()}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 5,
+                        fontSize: 11,
+                        padding: "3px 9px",
+                        background: "rgba(108,99,255,0.12)",
+                        border: "1px solid rgba(108,99,255,0.3)",
+                        borderRadius: 5,
+                        color: "var(--color-accent-2)",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                        fontFamily: "var(--font-sans)",
+                        transition: "all 0.15s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.background =
+                          "rgba(108,99,255,0.22)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.background =
+                          "rgba(108,99,255,0.12)")
+                      }
+                    >
+                      <svg
+                        width="10"
+                        height="10"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                        />
+                      </svg>
+                      Upload file
+                    </button>
+                  </div>
+                  <input
+                    ref={(el) => (fileRefs.current[node.id] = el)}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleFile(node.id, e.target.files[0])}
                   />
-                </svg>
-                Upload
-              </button>
-              <input
-                ref={(el) => (fileRefs.current[node.id] = el)}
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                onChange={(e) => handleImageFile(node.id, e.target.files[0])}
-              />
-              {/* URL input */}
-              <input
-                type="text"
-                placeholder="or paste image URL…"
-                defaultValue={node.data?.src || ""}
-                onBlur={(e) => handleImageUrl(node.id, e.target.value)}
+                </div>
+                {/* URL input */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0,
+                    padding: "0",
+                  }}
+                >
+                  <span
+                    style={{
+                      padding: "0 10px",
+                      fontSize: 11,
+                      color: "var(--color-text-3)",
+                      flexShrink: 0,
+                      fontFamily: "var(--font-mono)",
+                    }}
+                  >
+                    url
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="https://..."
+                    defaultValue={
+                      node.data?.src?.startsWith("blob:")
+                        ? ""
+                        : node.data?.src || ""
+                    }
+                    onBlur={(e) => handleUrl(node.id, e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleUrl(node.id, e.target.value);
+                        e.target.blur();
+                      }
+                    }}
+                    style={{
+                      flex: 1,
+                      fontSize: 11.5,
+                      padding: "9px 10px 9px 0",
+                      background: "transparent",
+                      border: "none",
+                      color: "var(--color-text-1)",
+                      outline: "none",
+                      fontFamily: "var(--font-mono)",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Text nodes */}
+          {textNodes.map((node) => (
+            <div key={node.id}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  marginBottom: 7,
+                }}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 1,
+                    background: "#f59e0b",
+                    display: "inline-block",
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    color: "var(--color-text-3)",
+                    fontFamily: "var(--font-mono)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  {node.name}
+                </span>
+              </div>
+              <textarea
+                rows={node.name === "Headline" ? 2 : 1}
+                defaultValue={node.data?.content || ""}
+                onBlur={(e) => handleText(node.id, e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter")
-                    handleImageUrl(node.id, e.target.value);
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleText(node.id, e.target.value);
+                    e.target.blur();
+                  }
                 }}
                 style={{
-                  flex: 1,
-                  fontSize: 11,
-                  padding: "5px 9px",
+                  width: "100%",
+                  fontSize: 12.5,
+                  padding: "9px 12px",
                   background: "var(--color-surface-2)",
                   border: "1px solid var(--color-border-2)",
-                  borderRadius: 7,
+                  borderRadius: 8,
                   color: "var(--color-text-1)",
+                  resize: "none",
                   outline: "none",
-                  fontFamily: "var(--font-mono)",
-                  minWidth: 0,
+                  fontFamily: "var(--font-sans)",
+                  lineHeight: 1.5,
+                  boxSizing: "border-box",
+                  transition: "border-color 0.18s",
                 }}
-              />
-            </div>
-          </div>
-        ))}
-
-        {/* Text nodes */}
-        {textNodes.map((node) => (
-          <div key={node.id}>
-            <div
-              style={{
-                fontSize: 11,
-                color: "var(--color-text-3)",
-                marginBottom: 5,
-                fontFamily: "var(--font-mono)",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
-              <span
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: 1,
-                  background: "rgba(245,158,11,0.5)",
-                  display: "inline-block",
-                }}
-              />
-              {node.name}
-            </div>
-            <textarea
-              rows={node.name === "Headline" ? 2 : 1}
-              defaultValue={node.data?.content || ""}
-              onBlur={(e) => handleTextChange(node.id, e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleTextChange(node.id, e.target.value);
-                  e.target.blur();
+                onFocus={(e) =>
+                  (e.target.style.borderColor = "var(--color-accent)")
                 }
-              }}
-              style={{
-                width: "100%",
-                fontSize: 12,
-                padding: "6px 9px",
-                background: "var(--color-surface-2)",
-                border: "1px solid var(--color-border-2)",
-                borderRadius: 7,
-                color: "var(--color-text-1)",
-                resize: "none",
-                outline: "none",
-                fontFamily: "var(--font-sans)",
-                lineHeight: 1.5,
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
-        ))}
-      </div>
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--color-border-2)";
+                  handleText(node.id, e.target.value);
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -305,10 +468,9 @@ export default function App() {
   const { layout, messages, loading, sendMessage, updateLayout, resetLayout } =
     useLayoutAgent();
   const [tab, setTab] = useState("preview");
-
   const artboard = layout.nodes[layout.rootNodes[0]];
   const msgCount = messages.filter(
-    (m) => m.role !== "assistant" || messages.indexOf(m) > 0,
+    (m, i) => m.role === "user" || (m.role === "assistant" && i > 0),
   ).length;
 
   return (
@@ -321,14 +483,14 @@ export default function App() {
         overflow: "hidden",
       }}
     >
-      {/* ── Header ── */}
+      {/* Header */}
       <header
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           padding: "0 20px",
-          height: 56,
+          height: 54,
           borderBottom: "1px solid var(--color-border)",
           background: "var(--color-surface)",
           flexShrink: 0,
@@ -337,19 +499,19 @@ export default function App() {
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div
             style={{
-              width: 34,
-              height: 34,
+              width: 32,
+              height: 32,
               borderRadius: 9,
               background: "linear-gradient(135deg,#6c63ff,#a78bfa)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 4px 12px rgba(108,99,255,0.4)",
+              boxShadow: "0 4px 12px rgba(108,99,255,0.35)",
             }}
           >
             <svg
-              width="16"
-              height="16"
+              width="15"
+              height="15"
               fill="none"
               stroke="#fff"
               strokeWidth="2"
@@ -364,7 +526,7 @@ export default function App() {
           <div>
             <div
               style={{
-                fontSize: 14,
+                fontSize: 13.5,
                 fontWeight: 700,
                 color: "var(--color-text-1)",
                 lineHeight: 1.2,
@@ -374,7 +536,7 @@ export default function App() {
             </div>
             <div
               style={{
-                fontSize: 11,
+                fontSize: 10.5,
                 color: "var(--color-text-3)",
                 fontFamily: "var(--font-mono)",
               }}
@@ -384,7 +546,31 @@ export default function App() {
           </div>
         </div>
 
-        <StatusPill count={msgCount} />
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            background: "rgba(34,197,94,0.1)",
+            border: "1px solid rgba(34,197,94,0.25)",
+            borderRadius: 99,
+            padding: "3px 10px",
+            fontSize: 11,
+            color: "var(--color-green)",
+            fontFamily: "var(--font-mono)",
+          }}
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: "var(--color-green)",
+              display: "inline-block",
+            }}
+          />
+          {msgCount} messages
+        </div>
 
         <button
           onClick={resetLayout}
@@ -430,26 +616,26 @@ export default function App() {
         </button>
       </header>
 
-      {/* ── Body ── */}
+      {/* Body */}
       <div
         style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}
       >
-        {/* ── Left: Chat + Edit Panel ── */}
+        {/* Left panel */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            width: 400,
+            width: 380,
             flexShrink: 0,
             borderRight: "1px solid var(--color-border)",
             background: "var(--color-surface)",
             minHeight: 0,
           }}
         >
-          {/* Chat status */}
+          {/* Status */}
           <div
             style={{
-              padding: "12px 16px",
+              padding: "9px 16px",
               borderBottom: "1px solid var(--color-border)",
               display: "flex",
               alignItems: "center",
@@ -473,25 +659,27 @@ export default function App() {
             />
             <span
               style={{
-                fontSize: 12,
+                fontSize: 11.5,
                 fontWeight: 600,
                 color: "var(--color-text-2)",
-                letterSpacing: "0.04em",
+                letterSpacing: "0.03em",
               }}
             >
               {loading ? "Thinking…" : "Ready"}
             </span>
           </div>
 
+          {/* Chat (scrollable) */}
           <ChatWindow messages={messages} loading={loading} />
 
-          {/* Edit panel: images + text */}
+          {/* Edit content panel */}
           <EditPanel layout={layout} updateLayout={updateLayout} />
 
+          {/* Chat input (pinned bottom) */}
           <ChatInput onSend={sendMessage} loading={loading} />
         </div>
 
-        {/* ── Right: Preview / JSON ── */}
+        {/* Right panel */}
         <div
           style={{
             flex: 1,
@@ -501,7 +689,6 @@ export default function App() {
             minHeight: 0,
           }}
         >
-          {/* Tab bar */}
           <div
             style={{
               display: "flex",
@@ -523,6 +710,7 @@ export default function App() {
                   stroke="currentColor"
                   strokeWidth="2"
                   viewBox="0 0 24 24"
+                  style={{ marginRight: 2 }}
                 >
                   <rect x="3" y="3" width="18" height="18" rx="2" />
                   <path d="M3 9h18M9 21V9" />
@@ -541,6 +729,7 @@ export default function App() {
                   stroke="currentColor"
                   strokeWidth="2"
                   viewBox="0 0 24 24"
+                  style={{ marginRight: 2 }}
                 >
                   <path
                     strokeLinecap="round"
@@ -552,7 +741,6 @@ export default function App() {
               active={tab === "json"}
               onClick={() => setTab("json")}
             />
-
             <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
               {[
                 ["1:1", 1080, 1080],
@@ -586,8 +774,6 @@ export default function App() {
               })}
             </div>
           </div>
-
-          {/* Panel content */}
           <div style={{ flex: 1, overflowY: "auto", padding: 20 }}>
             {tab === "preview" ? (
               <WireframePreview layout={layout} />
