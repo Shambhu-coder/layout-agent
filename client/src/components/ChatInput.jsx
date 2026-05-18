@@ -1,18 +1,19 @@
 import { useState } from "react";
 
-const QUICK_PROMPTS = [
-  { label: "9:16 Story", prompt: "Convert this design to 9:16" },
-  { label: "16:9 YouTube", prompt: "Convert this design to 16:9" },
-  { label: "Headline → Top", prompt: "Move the headline to the top" },
-  { label: "Center Product", prompt: "Center the product image" },
-  { label: "Badge Bigger", prompt: "Make the discount badge bigger" },
-  { label: "Red Headline", prompt: "Change the headline color to red" },
+const PROMPTS = [
+  { label: "→ 9:16", text: "Convert this design to 9:16" },
+  { label: "→ 16:9", text: "Convert this design to 16:9" },
+  { label: "→ 1:1", text: "Convert this design to 1:1" },
+  { label: "Headline top", text: "Move the headline to the top" },
+  { label: "Center product", text: "Center the product image" },
+  { label: "Badge bigger", text: "Make the discount badge bigger" },
+  { label: "Headline red", text: "Change the headline color to red" },
 ];
 
 export default function ChatInput({ onSend, loading }) {
   const [text, setText] = useState("");
 
-  const handleSubmit = () => {
+  const submit = () => {
     const t = text.trim();
     if (!t || loading) return;
     onSend(t);
@@ -22,68 +23,74 @@ export default function ChatInput({ onSend, loading }) {
   return (
     <div
       style={{
-        borderTop: "1px solid var(--color-border)",
-        padding: "12px 14px 14px",
-        background: "var(--color-surface)",
         flexShrink: 0,
+        borderTop: "1px solid var(--color-border)",
+        background: "var(--color-surface)",
+        padding: "10px 12px 12px",
       }}
     >
-      {/* Quick prompt chips */}
+      {/* Quick chips */}
       <div
-        style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 }}
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 5,
+          marginBottom: 10,
+        }}
       >
-        {QUICK_PROMPTS.map(({ label, prompt }) => (
+        {PROMPTS.map(({ label, text: t }) => (
           <button
             key={label}
-            onClick={() => onSend(prompt)}
+            onClick={() => onSend(t)}
             disabled={loading}
             style={{
-              fontSize: 11,
-              padding: "4px 10px",
+              fontSize: 10.5,
+              padding: "3px 9px",
               borderRadius: 99,
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              color: "var(--color-text-3)",
-              cursor: "pointer",
+              background: "var(--color-surface-3)",
+              border: "1px solid var(--color-border-2)",
+              color: "var(--color-text-2)",
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.45 : 1,
               fontFamily: "var(--font-mono)",
               transition: "all 0.15s",
               whiteSpace: "nowrap",
             }}
             onMouseEnter={(e) => {
               if (!loading) {
-                e.currentTarget.style.background = "rgba(108,99,255,0.12)";
-                e.currentTarget.style.borderColor = "rgba(108,99,255,0.35)";
-                e.currentTarget.style.color = "var(--color-accent-2)";
+                e.currentTarget.style.background = "rgba(124,111,255,0.12)";
+                e.currentTarget.style.borderColor = "rgba(124,111,255,0.4)";
+                e.currentTarget.style.color = "#a89fff";
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.03)";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
-              e.currentTarget.style.color = "var(--color-text-3)";
+              e.currentTarget.style.background = "var(--color-surface-3)";
+              e.currentTarget.style.borderColor = "var(--color-border-2)";
+              e.currentTarget.style.color = "var(--color-text-2)";
             }}
           >
-            ⚡ {label}
+            {label}
           </button>
         ))}
       </div>
 
-      {/* Input row */}
+      {/* Textarea + send */}
       <div
         style={{
           display: "flex",
           gap: 8,
           alignItems: "flex-end",
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 14,
-          padding: "6px 6px 6px 14px",
+          background: "var(--color-surface-3)",
+          border: "1px solid var(--color-border-2)",
+          borderRadius: 12,
+          padding: "8px 8px 8px 13px",
           transition: "border-color 0.2s",
         }}
         onFocusCapture={(e) =>
-          (e.currentTarget.style.borderColor = "rgba(108,99,255,0.5)")
+          (e.currentTarget.style.borderColor = "rgba(124,111,255,0.5)")
         }
         onBlurCapture={(e) =>
-          (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")
+          (e.currentTarget.style.borderColor = "var(--color-border-2)")
         }
       >
         <textarea
@@ -92,7 +99,7 @@ export default function ChatInput({ onSend, loading }) {
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              handleSubmit();
+              submit();
             }
           }}
           placeholder="Describe what to change…"
@@ -102,7 +109,7 @@ export default function ChatInput({ onSend, loading }) {
             flex: 1,
             background: "transparent",
             border: "none",
-            padding: "4px 0",
+            padding: 0,
             fontSize: 13,
             color: "var(--color-text-1)",
             resize: "none",
@@ -112,17 +119,17 @@ export default function ChatInput({ onSend, loading }) {
           }}
         />
         <button
-          onClick={handleSubmit}
+          onClick={submit}
           disabled={loading || !text.trim()}
           style={{
-            width: 38,
-            height: 38,
-            borderRadius: 10,
+            width: 36,
+            height: 36,
+            borderRadius: 9,
             flexShrink: 0,
             background:
               !loading && text.trim()
-                ? "linear-gradient(135deg,#6c63ff,#8b83ff)"
-                : "rgba(255,255,255,0.05)",
+                ? "linear-gradient(135deg,#7c6fff,#b49fff)"
+                : "var(--color-surface-2)",
             border: "none",
             cursor: !loading && text.trim() ? "pointer" : "not-allowed",
             display: "flex",
@@ -131,7 +138,7 @@ export default function ChatInput({ onSend, loading }) {
             transition: "all 0.2s",
             boxShadow:
               !loading && text.trim()
-                ? "0 4px 12px rgba(108,99,255,0.4)"
+                ? "0 3px 12px rgba(124,111,255,0.4)"
                 : "none",
           }}
         >
@@ -143,7 +150,7 @@ export default function ChatInput({ onSend, loading }) {
               fill="none"
               stroke="rgba(255,255,255,0.4)"
               strokeWidth="2.5"
-              style={{ animation: "spin 1s linear infinite" }}
+              className="spin"
             >
               <path d="M21 12a9 9 0 11-6.219-8.56" />
             </svg>
@@ -153,7 +160,7 @@ export default function ChatInput({ onSend, loading }) {
               height="15"
               viewBox="0 0 24 24"
               fill="none"
-              stroke={text.trim() ? "#fff" : "rgba(255,255,255,0.25)"}
+              stroke={text.trim() ? "#fff" : "rgba(255,255,255,0.2)"}
               strokeWidth="2.5"
             >
               <path
@@ -165,7 +172,16 @@ export default function ChatInput({ onSend, loading }) {
           )}
         </button>
       </div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <p
+        style={{
+          fontSize: 10,
+          color: "var(--color-text-3)",
+          marginTop: 6,
+          fontFamily: "var(--font-mono)",
+        }}
+      >
+        Enter to send · Shift+Enter for new line
+      </p>
     </div>
   );
 }
